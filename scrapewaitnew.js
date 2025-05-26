@@ -9,7 +9,7 @@ const inputFilePath = '/home/kali/input_sites.txt';
 const outputFilePath = '/home/kali/links_output.txt';
 const failedFilePath = '/home/kali/failed_sites.txt';
 
-// ⚠️ Path to your Chrome profile
+// Path to your Chrome profile
 const chromeProfilePath = '/home/kali/.config/my-chrome-profile';
 
 function delay(ms) {
@@ -54,12 +54,12 @@ async function scrapeLinksFromList(websites, outputStream, browser) {
           await simulateHumanBehavior(page);
           await delay(3000);
 
-          // ✅ Check HTTP status
+          // Check HTTP status
           if (response && [403, 429].includes(response.status())) {
             throw new Error(`HTTP ${response.status()} - Access Blocked`);
           }
 
-          // ✅ Check for common block phrases in body text
+          // Check for common block phrases in body text
           const bodyText = await page.evaluate(() => document.body.innerText.toLowerCase());
 
           const blockIndicators = [
@@ -86,28 +86,28 @@ async function scrapeLinksFromList(websites, outputStream, browser) {
           if (links.length > 0) {
             outputStream.write(`Links from: ${website}\n`);
             outputStream.write(links.join('\n') + '\n\n');
-            console.log(`✅ Found ${links.length} links from ${website}`);
+            console.log(`Found ${links.length} links from ${website}`);
           } else {
-            console.log(`⚠️ No links found on ${website}`);
+            console.log(`⚠No links found on ${website}`);
           }
 
           success = true;
         } catch (error) {
-          console.warn(`⚠️ Attempt failed for ${website}: ${error.message}`);
+          console.warn(`Attempt failed for ${website}: ${error.message}`);
 
-          // 📸 Take a screenshot for debugging
+          // Take a screenshot for debugging
           const screenshotPath = `screenshot_${website.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.png`;
           await page.screenshot({ path: screenshotPath });
-          console.log(`📸 Screenshot saved: ${screenshotPath}`);
+          console.log(`Screenshot saved: ${screenshotPath}`);
 
           retries--;
 
           if (retries > 0) {
             const waitTime = 3000 + Math.floor(Math.random() * 3000);
-            console.log(`🔁 Retrying in ${waitTime / 1000}s...`);
+            console.log(`Retrying in ${waitTime / 1000}s...`);
             await delay(waitTime);
           } else {
-            console.error(`❌ Failed: ${website}`);
+            console.error(`Failed: ${website}`);
             failedWebsites.push(website);
           }
         }
@@ -117,7 +117,7 @@ async function scrapeLinksFromList(websites, outputStream, browser) {
       await delay(3000 + Math.floor(Math.random() * 3000));
 
     } catch (error) {
-      console.error(`🔥 Critical error scraping ${website}: ${error.message}`);
+      console.error(`Critical error scraping ${website}: ${error.message}`);
       failedWebsites.push(website);
     }
   }
@@ -142,17 +142,17 @@ async function scrapeLinksFromFile() {
   let round = 1;
 
   while (allWebsites.length > 0) {
-    console.log(`\n🔁 Starting round ${round} with ${allWebsites.length} URLs\n`);
+    console.log(`\nStarting round ${round} with ${allWebsites.length} URLs\n`);
 
     const failedWebsites = await scrapeLinksFromList(allWebsites, outputStream, browser);
 
     if (failedWebsites.length === 0) {
-      console.log(`🎉 All URLs processed successfully after ${round} rounds!`);
+      console.log(`All URLs processed successfully after ${round} rounds!`);
       break;
     }
 
     fs.writeFileSync(failedFilePath, failedWebsites.join('\n'));
-    console.log(`❌ ${failedWebsites.length} URLs failed in round ${round}, will retry.`);
+    console.log(`${failedWebsites.length} URLs failed in round ${round}, will retry.`);
 
     allWebsites = failedWebsites;
     round++;
@@ -161,9 +161,9 @@ async function scrapeLinksFromFile() {
   outputStream.end();
   await browser.close();
 
-  console.log('✅ Scraping completed. Results saved to:', outputFilePath);
+  console.log('Scraping completed. Results saved to:', outputFilePath);
   if (fs.existsSync(failedFilePath)) {
-    console.log('🚫 Failed URLs saved to:', failedFilePath);
+    console.log('Failed URLs saved to:', failedFilePath);
   }
 }
 
