@@ -46,7 +46,7 @@ async function scrapeLinksFromList(websites, outputStream, browser) {
           if (retries === maxRetries) {
             response = await page.goto(website, { waitUntil: 'load', timeout: 45000 });
           } else {
-            console.log('🔄 Reloading page...');
+            console.log('Reloading page...');
             response = await page.reload({ waitUntil: 'load', timeout: 45000 });
           }
 
